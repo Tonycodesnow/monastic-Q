@@ -1,1 +1,3 @@
 # monastic-Q
+
+GraphQL application
