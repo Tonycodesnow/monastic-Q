@@ -12,7 +12,7 @@ type Thought {
 }
 
 type Query {
-  thoughts: [Thought]
+  thoughts( useername: String): [Thought]
 }
 `;
 
