@@ -47,7 +47,6 @@ const resolvers = {
 
       return { token, user };
     },
-
     login: async (parent, { email, passowrd }) => {
       const user = await User.findOne({ email });
 
@@ -65,28 +64,9 @@ const resolvers = {
       return { token, user };
     },
 
-    addReaction: async (parent, { thoughtId, reactionBody }) => {
-      if (context.user) {
-        const updateThought = await Thought.findOneAndUpdate(
-          { _id: thoughtId },
-          {
-            $push: {
-              reactions: { reactionBody, username: context.user.username },
-            },
-          },
-          { new: true, runValidators: true }
-        );
-        return updateThougth;
-      }
-      throw new AuthenticationError("You need to be logged in!");
-    },
-
     addThought: async (parent, args, context) => {
       if (context.user) {
-        const thought = await Thought.create({
-          ...args,
-          username: context.user.username,
-        });
+        const thought = await Thought.create({ ...args, username: context.user.username });
 
         await User.findByIdAndUpdate(
           { _id: context.user._id },
@@ -98,6 +78,19 @@ const resolvers = {
       }
 
       throw new AuthenticationError("You need to be logged in to do that!");
+    },
+    addReaction: async (parent, { thoughtId, reactionBody }, context) => {
+      if (context.user) {
+        const updatedThought = await Thought.findOneAndUpdate(
+          { _id: thoughtId },
+          { $push: { reactions: { reactionBody, username: context.user.username } } },
+          { new: true, runValidators: true }
+        );
+
+        return updateThought;
+      }
+
+      throw new AuthenticationError("You need to be logged in!");
     },
 
     addFriend: async (parent, { friendId }, context) => {
